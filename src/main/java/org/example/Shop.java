@@ -1,21 +1,19 @@
 package org.example;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Arrays;
+import java.util.concurrent.Callable;
 
-public class Shop {
+public class Shop implements Callable<Integer> {
     private final int[] mas = new int[10];
-    AtomicInteger money = new AtomicInteger(0);
 
     public Shop() {
         for(int i = 0; i < mas.length; i++){
-            mas[i] = (int) Math.round((Math.random() * 2000));
+            mas[i] = 1000 + (int) Math.round((Math.random() * 2000));
         }
     }
 
-    public int getSumMas() {
-        for (Integer i : mas) {
-            money.addAndGet(i);
-        }
-        return money.get();
+    @Override
+    public Integer call() {
+        return Arrays.stream(mas).sum();
     }
 }

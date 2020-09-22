@@ -1,22 +1,29 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.IntStream;
+
+
 public class App
 {
-    public static void main( String[] args ) throws InterruptedException {
-        Shop shop = new Shop();
+    public static void main( String[] args ) throws Exception {
+        int countShops = 3;
+        final ExecutorService executorService = Executors.newFixedThreadPool(countShops);
+        List<Callable <Integer>> myCallable = new ArrayList<>(){{
+            add(new Shop());
+            add(new Shop());
+            add(new Shop());
+        }};
 
-        Thread thread1 = new Thread(null, shop::getSumMas, "Магазин 1");
-        Thread thread2 = new Thread(null, shop::getSumMas, "Магазин 2");
-        Thread thread3 = new Thread(null, shop::getSumMas, "Магазин 3");
+        LongAdder longAdder = new LongAdder();
+        for (Callable<Integer> integerCallable : myCallable) {
+            longAdder.add(integerCallable.call());
+        }
 
-        thread1.start();
-        thread2.start();
-        thread3.start();
-
-        thread1.join();
-        thread2.join();
-        thread3.join();
-
-        System.out.println("\nВыручка по всем магазинам составила: " + shop.money.get() + " у.е.");
+        System.out.println("Выручка " + myCallable.size() + " магазинов за день составила: " + longAdder.sum());
+        executorService.shutdown();
     }
 }
